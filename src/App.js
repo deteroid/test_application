@@ -4,56 +4,67 @@ import Person from './Person/Person';
 
 class App extends Component {
   state = {
-    person: [
-      { name: "Onkar", age: 20 },
-      { name: "Abhishek", age: 24 },
-      { name: "Akash", age: 25 },
-
-    ]
+    persons: [
+      {id:"A1", name: "Onkar", age: 20 },
+      {id:"A2", name: "Abhishek", age: 24 },
+      {id:"A3", name: "Akash", age: 25 },
+    ],
+    Visible: false,
   }
 
   switchHandler = () => {
-    this.setState({
-      person: [
-        { name: "Raju", age: 24 },
-        { name: "Abhishek", age: 20 },
-        { name: "Akash", age: 25 },
-
-      ]
-    })
+    const show = this.state.Visible;
+    this.setState({ Visible: !show });
   }
 
-  switchHandlerInput = (event) => {
-    this.setState({
-      person: [
-        { name: event.target.value, age: 24 },
-        { name: "Abhishek", age: 20 },
-        { name: "Akash", age: 25 },
+  switchHandlerInput = ( event, id ) => {
+    const personIndex = this.state.persons.findIndex(p => {
+      return p.id === id;
+    });
 
-      ]
-    })
+    const Person = {...this.state.persons[personIndex]};
+
+    Person.name = event.target.value;
+
+    const Persons = [...this.state.persons];
+    Persons[personIndex] = Person;
+
+    this.setState( {persons : Persons });
+
   }
 
+  deleteHandler = (index) => {
+    const person = this.state.persons;
+    person.splice(index, 1);
+    this.setState({person: person});
+  }
 
 
   render() {
+
+    let persons = null;
+
+    if (this.state.Visible) {
+      persons = (
+        <div>
+          {this.state.persons.map( (person, index) => {
+            return <Person age={person.age} 
+            name={person.name} 
+            key={person.id}
+            clicked={() => this.deleteHandler(index)}
+            changed={(event) => this.switchHandlerInput(event, person.id)}
+            ></Person>
+          } )}
+        </div>
+
+      )
+    }
+
     return (
       <div className="App">
         <h1>This is H1</h1>
         <button onClick={this.switchHandler} >Switch name</button>
-        <Person
-          name={this.state.person[0].name}
-          age={this.state.person[0].age} 
-          click={this.switchHandlerInput}
-          />
-        <Person
-          name={this.state.person[1].name}
-          age={this.state.person[1].age} 
-          />
-        <Person
-          name={this.state.person[2].name}
-          age={this.state.person[2].age} 
-          />
+        {persons}
 
       </div>
     )
